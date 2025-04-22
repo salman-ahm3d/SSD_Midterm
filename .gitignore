@@ -7,4 +7,4 @@
 [Ss]cripts
 pyvenv.cfg
 .venv
-
+*pycache*
