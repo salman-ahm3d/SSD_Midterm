@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_BASE_URL = "http://localhost:8000"
+API_BASE_URL = "http://backend:8000"
 
 st.title("📡 Telecom Billing System")
 
