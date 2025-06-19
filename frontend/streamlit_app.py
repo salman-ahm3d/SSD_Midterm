@@ -5,7 +5,7 @@ API_BASE_URL = "http://backend:8000"
 
 st.title("📡 Telecom Billing System")
 
-menu = st.sidebar.selectbox("Select Operation", ["Create Customer", "View Customers", "Delete Customer", "Create Bill", "View Bills", "Delete Bill"])
+menu = st.sidebar.selectbox("Select Operation", ["Create Customer", "View Customers", "Update Customer", "Delete Customer", "Create Bill", "View Bills", "Update Bill", "Delete Bill"])
 
 # ------------------ CUSTOMER ------------------
 
@@ -45,6 +45,28 @@ elif menu == "Delete Customer":
             st.success("Customer deleted.")
         else:
             st.error(f"Failed: {res.text}")
+
+elif menu == "Update Customer":
+    st.header("✏️ Update Customer")
+    cid = st.number_input("Enter Customer ID to Update", min_value=1)
+    name = st.text_input("New Name (leave blank to keep unchanged)")
+    phone = st.text_input("New Phone Number (leave blank to keep unchanged)")
+    email = st.text_input("New Email (leave blank to keep unchanged)")
+    address = st.text_area("New Address (leave blank to keep unchanged)")
+    if st.button("Update Customer"):
+        payload = {}
+        if name: payload["name"] = name
+        if phone: payload["phone_number"] = phone
+        if email: payload["email"] = email
+        if address: payload["address"] = address
+        if not payload:
+            st.warning("No fields to update.")
+        else:
+            res = requests.put(f"{API_BASE_URL}/customers/{cid}", json=payload)
+            if res.status_code == 200:
+                st.success("Customer updated.")
+            else:
+                st.error(f"Failed: {res.text}")
 
 # ------------------ BILL ------------------
 
@@ -86,4 +108,31 @@ elif menu == "Delete Bill":
             st.success("Bill deleted.")
         else:
             st.error(f"Failed: {res.text}")
+
+elif menu == "Update Bill":
+    st.header("✏️ Update Bill")
+    bill_id = st.number_input("Enter Bill ID to Update", min_value=1)
+    customer_id = st.text_input("New Customer ID (leave blank to keep unchanged)")
+    billing_date = st.text_input("New Billing Date (YYYY-MM-DD, leave blank to keep unchanged)")
+    due_date = st.text_input("New Due Date (YYYY-MM-DD, leave blank to keep unchanged)")
+    amount = st.text_input("New Amount (leave blank to keep unchanged)")
+    status = st.selectbox("New Status (leave blank to keep unchanged)", ["", "Paid", "Unpaid", "Overdue"])
+    if st.button("Update Bill"):
+        payload = {}
+        if customer_id: payload["customer_id"] = int(customer_id)
+        if billing_date: payload["billing_date"] = billing_date
+        if due_date: payload["due_date"] = due_date
+        if amount: payload["amount"] = float(amount)
+        if status: payload["status"] = status if status else None
+        # Remove None values
+        payload = {k: v for k, v in payload.items() if v is not None}
+        if not payload:
+            st.warning("No fields to update.")
+        else:
+            res = requests.put(f"{API_BASE_URL}/bills/{bill_id}", json=payload)
+            if res.status_code == 200:
+                st.success("Bill updated.")
+            else:
+                st.error(f"Failed: {res.text}")
+
 

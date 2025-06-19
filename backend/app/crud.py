@@ -22,6 +22,17 @@ def delete_customer(db: Session, customer_id: int):
         db.commit()
     return customer
 
+def update_customer(db: Session, customer_id: int, customer_update: schemas.CustomerUpdate):
+    customer = get_customer(db, customer_id)
+    if not customer:
+        return None
+    update_data = customer_update.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(customer, key, value)
+    db.commit()
+    db.refresh(customer)
+    return customer
+
 # Bill CRUD
 def create_bill(db: Session, bill: schemas.BillCreate):
     db_bill = models.Bill(**bill.dict())
@@ -42,4 +53,16 @@ def delete_bill(db: Session, bill_id: int):
         db.delete(bill)
         db.commit()
     return bill
+
+def update_bill(db: Session, bill_id: int, bill_update: schemas.BillUpdate):
+    bill = get_bill(db, bill_id)
+    if not bill:
+        return None
+    update_data = bill_update.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(bill, key, value)
+    db.commit()
+    db.refresh(bill)
+    return bill
+
 

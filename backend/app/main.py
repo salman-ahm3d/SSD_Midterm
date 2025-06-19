@@ -35,6 +35,13 @@ def read_customer(customer_id: int, db: Session = Depends(get_db)):
 def delete_customer(customer_id: int, db: Session = Depends(get_db)):
     return crud.delete_customer(db, customer_id)
 
+@app.put("/customers/{customer_id}", response_model=schemas.Customer)
+def update_customer(customer_id: int, customer_update: schemas.CustomerUpdate, db: Session = Depends(get_db)):
+    db_customer = crud.update_customer(db, customer_id, customer_update)
+    if not db_customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    return db_customer
+
 # Bills
 @app.post("/bills/", response_model=schemas.Bill)
 def create_bill(bill: schemas.BillCreate, db: Session = Depends(get_db)):
@@ -54,4 +61,12 @@ def read_bill(bill_id: int, db: Session = Depends(get_db)):
 @app.delete("/bills/{bill_id}", response_model=schemas.Bill)
 def delete_bill(bill_id: int, db: Session = Depends(get_db)):
     return crud.delete_bill(db, bill_id)
+
+@app.put("/bills/{bill_id}", response_model=schemas.Bill)
+def update_bill(bill_id: int, bill_update: schemas.BillUpdate, db: Session = Depends(get_db)):
+    db_bill = crud.update_bill(db, bill_id, bill_update)
+    if not db_bill:
+        raise HTTPException(status_code=404, detail="Bill not found")
+    return db_bill
+
 
